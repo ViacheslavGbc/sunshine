@@ -1,5 +1,5 @@
 #pragma once
-#include <corecrt_math.h>
+#include <cmath>
 
 //----------------------------------------------------------------------------------
 // Defines and Macros

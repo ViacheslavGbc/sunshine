@@ -1,112 +1,80 @@
 #include "rlImGui.h"
-#include "Physics.h"
-#include "Collision.h"
+#include "Math.h"
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
-#include <array>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
+struct Rigidbody
+{
+	// insert physics variables here
+};
 
-using namespace std;
+Vector2 xLerp(Vector2 A, Vector2 B, float t)
+{
+	return A + (B - A) * t;
+}
 
 int main(void)
 {
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
-    InitWindow(screenWidth, screenHeight, "Sunshine");
-    rlImGuiSetup(true);
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sunshine");
+	rlImGuiSetup(true);
+	SetTargetFPS(60);
 
-    vector<Rectangle> obstacles;
-    std::ifstream inFile("../game/assets/data/obstacles.txt");
-    while (!inFile.eof())
-    {
-        Rectangle obstacle;
-        inFile >> obstacle.x >> obstacle.y >> obstacle.width >> obstacle.height;
-        obstacles.push_back(obstacle);
-    }
-    inFile.close();
+	Vector2 A{ SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.75f };
+	Vector2 B{ SCREEN_WIDTH * 0.9f, SCREEN_HEIGHT * 0.5f };
+	Vector2 C = A;
+	float t = 0.0f;
 
-    float playerRotation = 0.0f;
-    const float playerWidth = 60.0f;
-    const float playerHeight = 40.0f;
-    const float playerRange = 1000.0f;
-    const float playerRotationSpeed = 100.0f;
+	Vector2 position{ SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.9f };
+	Vector2 velocity{};
+	Vector2 acceleration{};
 
-    const char* recText = "Nearest to Rectangle";
-    const char* circleText = "Nearest to Circle";
-    const char* poiText = "Nearest Intersection";
-    const int fontSize = 10;
-    const int recTextWidth = MeasureText(recText, fontSize);
-    const int circleTextWidth = MeasureText(circleText, fontSize);
-    const int poiTextWidth = MeasureText(poiText, fontSize);
+	Vector2 target{ SCREEN_WIDTH * 0.9f, SCREEN_HEIGHT * 0.1f };
+	float seekerSpeed = 500.0f;
 
-    const Rectangle rectangle{ 1000.0f, 500.0f, 160.0f, 90.0f };
-    const Circle circle{ { 1000.0f, 250.0f }, 50.0f };
+	while (!WindowShouldClose())
+	{
+		//const float dt = GetFrameTime();
+		//position = position + velocity * dt + acceleration * 0.5f * dt * dt;
+		//velocity = velocity + acceleration * dt;
+		//if (position.y > SCREEN_HEIGHT) position.y = 0.0f;
+		//if (position.y < 0.0f) position.y = SCREEN_HEIGHT;
+		//if (position.x > SCREEN_WIDTH) position.x = 0.0f;
+		//if (position.x < 0.0f) position.x = SCREEN_WIDTH;
 
-    bool demoGUI = false;
-    SetTargetFPS(60);
-    while (!WindowShouldClose())
-    {
-        float dt = GetFrameTime();
-        if (IsKeyDown(KEY_E))
-            playerRotation += playerRotationSpeed * dt;
-        if (IsKeyDown(KEY_Q))
-            playerRotation -= playerRotationSpeed * dt;
+		// AB = B - A
+		//Vector2 direction = Normalize(target - position);
+		//Vector2 desiredVelocity = direction * seekerSpeed;
+		//acceleration = desiredVelocity - velocity;
 
-        const Vector2 playerPosition = GetMousePosition();
-        const Vector2 playerDirection = Direction(playerRotation * DEG2RAD);
-        const Vector2 playerEnd = playerPosition + playerDirection * playerRange;
-        const Rectangle playerRec{ playerPosition.x, playerPosition.y, playerWidth, playerHeight };
+		C = xLerp(A, B, t);
 
-        const Vector2 nearestRecPoint = NearestPoint(playerPosition, playerEnd,
-            { rectangle.x + rectangle.width * 0.5f, rectangle.y + rectangle.height * 0.5f });
-        const Vector2 nearestCirclePoint = NearestPoint(playerPosition, playerEnd, circle.position);
-        Vector2 poi;
+		BeginDrawing();
+		ClearBackground(RAYWHITE);
+		DrawCircleV(A, 20.0f, RED);
+		DrawCircleV(B, 20.0f, GREEN);
+		DrawCircleV(C, 10.0f, GRAY);
+		DrawLineV(A, B, BLACK);
+		//DrawCircleV(position, 20.0f, RED);
+		//DrawCircleV(target, 20.0f, BLUE);
 
-        const bool collision = NearestIntersection(playerPosition, playerEnd, obstacles, poi);
-        const bool rectangleVisible = IsRectangleVisible(playerPosition, playerEnd, rectangle, obstacles);
-        const bool circleVisible = IsCircleVisible(playerPosition, playerEnd, circle, obstacles);
+		// Draw line 100 units above the seeker
+		//Vector2 end = position + Vector2{0.0f, -100.0f};
+		//DrawLineV(position, end, RED);
+		//DrawText("100 pixels above", end.x, end.y, 20, RED);
 
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
+		rlImGuiBegin();
+		ImGui::SliderFloat("Interpolation", &t, 0.0f, 1.0f);
+		//ImGui::SliderFloat("Seeker speed", &seekerSpeed, -100.0f, 100.0f);
+		//ImGui::SliderFloat2("Target", &target.x, 0.0f, SCREEN_WIDTH);
+		//ImGui::SliderFloat2("Position", &position.x, 0.0f, SCREEN_WIDTH);
+		//ImGui::SliderFloat2("Velocity", &velocity.x, -100.0f, 100.0f);
+		//ImGui::SliderFloat2("Acceleration", &acceleration.x, -100.0f, 100.0f);
+		rlImGuiEnd();
 
-        // Render player
-        DrawRectanglePro(playerRec, { playerWidth * 0.5f, playerHeight * 0.5f }, playerRotation, PURPLE);
-        DrawLine(playerPosition.x, playerPosition.y, playerEnd.x, playerEnd.y, BLUE);
-        DrawCircleV(playerPosition, 10.0f, BLUE);
+		EndDrawing();
+	}
 
-        // Render geometry
-        for (const Rectangle& obstacle : obstacles)
-            DrawRectangleRec(obstacle, GREEN);
-        DrawRectangleRec(rectangle, rectangleVisible ? GREEN : RED);
-        DrawCircleV(circle.position, circle.radius, circleVisible ? GREEN : RED);
-
-        // Render labels
-        DrawText(circleText, nearestCirclePoint.x - circleTextWidth * 0.5f, nearestCirclePoint.y - fontSize * 2, fontSize, BLUE);
-        DrawCircleV(nearestRecPoint, 10.0f, BLUE);
-        DrawText(recText, nearestRecPoint.x - recTextWidth * 0.5f, nearestRecPoint.y - fontSize * 2, fontSize, BLUE);
-        DrawCircleV(nearestCirclePoint, 10.0f, BLUE);
-        if (collision)
-        {
-            DrawText(poiText, poi.x - poiTextWidth * 0.5f, poi.y - fontSize * 2, fontSize, BLUE);
-            DrawCircleV(poi, 10.0f, BLUE);
-        }
-
-        // Render GUI
-        if (IsKeyPressed(KEY_GRAVE)) demoGUI = !demoGUI;
-        if (demoGUI)
-        {
-            rlImGuiBegin();
-            ImGui::ShowDemoWindow(nullptr);
-            rlImGuiEnd();
-        }
-
-        EndDrawing();
-    }
-
-    rlImGuiShutdown();
-    CloseWindow();
-
-    return 0;
+	rlImGuiShutdown();
+	CloseWindow();
+	return 0;
 }
