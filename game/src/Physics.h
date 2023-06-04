@@ -29,6 +29,14 @@ Vector2 Decelerate(
     return Negate(Normalize(seekerVelocity)) * a;
 }
 
+/*// Rotate max radians towards the target
+RMAPI Vector2 RotateTowards(Vector2 from, Vector2 to, float maxRadians)
+{
+    float deltaRadians = LineAngle(from, to);
+    return Rotate(from, fminf(deltaRadians, maxRadians) * Sign(Cross(from, to)));
+}
+
+
 // Accelerate towards target
 Vector2 Seek(
     const Vector2& targetPosition,
@@ -37,4 +45,4 @@ Vector2 Seek(
 {
     Vector2 desiredVelocity = Normalize(targetPosition - seekerPosition) * maxSpeed;
     return desiredVelocity - seekerVelocity;
-}
+}*/
