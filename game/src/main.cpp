@@ -135,10 +135,14 @@ int main(void)
 		DrawCircleV(cursor, radius, BLUE);							// cursor driven blue circle
 		DrawLineV(position, position + right * 100.0f, BLUE);		// drawing 2 antennas for main circle
 		DrawLineV(position, position + left * 100.0f, BLUE);
+		
 		DrawLineBezierCubic(position, position + 100, position, position + 150, 10.0f, DARKBROWN); //  not sure why this thick brown line
 		DrawCircleSector(position+20, 100.0f, { 1.0f }, { 4.0f }, 2, BLACK); // and this sector either. may be Kandinsky
 		DrawRing(position + 40, 40.0f, 50.0f, 0.0f, 180.0f, 5, ORANGE); // inspired by the same guy
-		
+		MemFree(MemAlloc(1024));  // let us free some allocated memory
+
+
+
 
 		if (IsKeyPressed(KEY_GRAVE)) useGUI = !useGUI;		// attaching Graph. user interface 
 		if (useGUI)
