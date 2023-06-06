@@ -1,14 +1,26 @@
 #pragma once
 #include "Math.h"
 
-struct Rigidbody
+/*struct Rigidbody
 {
     Vector2 vel{ 0.0f, 0.0f };
     Vector2 acc{ 0.0f, 0.0f };
 };
-
+*/
 // v2 = v1 + a(t)
 // p2 = p1 + v2(t) + 0.5a(t^2)
+
+
+struct Rigidbody
+{
+    Vector2 pos{};
+    Vector2 vel{};
+    Vector2 acc{};
+
+    Vector2 dir{};
+    float angularSpeed;
+};
+
 Vector2 Integrate(const Vector2& pos, Rigidbody& rb, float dt)
 {
     rb.vel = rb.vel + rb.acc * dt;

@@ -1,10 +1,12 @@
-/*
+
 #include "rlImGui.h"
 #include "Math.h"
+#include "Physics.h"
+#include "Collision.h"
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-struct Rigidbody
+/* struct Rigidbody
 {
 	// insert physics variables here
 };
@@ -72,13 +74,7 @@ int main(void)
 		//ImGui::SliderFloat2("Acceleration", &acceleration.x, -100.0f, 100.0f);
 		rlImGuiEnd();
 
-		EndDrawing();
-	}
 
-	rlImGuiShutdown();
-	CloseWindow();
-	return 0;
-}*/
 
 
 
@@ -86,14 +82,6 @@ int main(void)
 ///////////////////////////////////////////////////
 
 
-
-
-
-
-#include "rlImGui.h"
-#include "Math.h"
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
 
 bool CheckCollisionLineCircle(Vector2 lineStart, Vector2 lineEnd, Vector2 circlePosition, float circleRadius)
 {
@@ -136,13 +124,7 @@ int main(void)
 		DrawLineV(position, position + right * 100.0f, BLUE);		// drawing 2 antennas for main circle
 		DrawLineV(position, position + left * 100.0f, BLUE);
 		
-		DrawLineBezierCubic(position, position + 100, position, position + 150, 10.0f, DARKBROWN); //  not sure why this thick brown line
-		DrawCircleSector(position+20, 100.0f, { 1.0f }, { 4.0f }, 2, BLACK); // and this sector either. may be Kandinsky
-		DrawRing(position + 40, 40.0f, 50.0f, 0.0f, 180.0f, 5, ORANGE); // inspired by the same guy
-		MemFree(MemAlloc(1024));  // let us free some allocated memory
-
-
-
+	
 
 		if (IsKeyPressed(KEY_GRAVE)) useGUI = !useGUI;		// attaching Graph. user interface 
 		if (useGUI)
@@ -151,33 +133,13 @@ int main(void)
 			rlImGuiEnd();
 		}
 
-		DrawFPS(10, 10);										// outputing information (text) for user
-		DrawText("Press ~ to open/close GUI", 10, 30, 20, GRAY);
-		EndDrawing();
-	}
 
-	rlImGuiShutdown();
-	CloseWindow();
-	return 0;
-}
 
 
 ////////////////////////////////////////////////////////////////
-/*
-#include "rlImGui.h"
-#include "Math.h"
-#include "Physics.h"
+*/
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
-
-bool CheckCollisionLineCircle(Vector2 lineStart, Vector2 lineEnd, Vector2 circlePosition, float circleRadius)
-{
-	Vector2 nearest = NearestPoint(lineStart, lineEnd, circlePosition);
-	return DistanceSqr(nearest, circlePosition) <= circleRadius * circleRadius;
-}
-/*
-struct Rigidbody
+/*struct Rigidbody
 {
 	Vector2 pos{};
 	Vector2 vel{};
@@ -186,33 +148,25 @@ struct Rigidbody
 	Vector2 dir{};
 	float angularSpeed;
 };*/
-/*
-RMAPI float Sign(float value)
-{
-	float result = (value < 0.0f) ? -1.0f : 1.0f;
 
-	return result;
+bool CheckCollisionLineCircle(Vector2 lineStart, Vector2 lineEnd, Vector2 circlePosition, float circleRadius)
+{
+	Vector2 nearest = NearestPoint(lineStart, lineEnd, circlePosition);
+	return DistanceSqr(nearest, circlePosition) <= circleRadius * circleRadius;
 }
 
-RMAPI Vector3 Cross(Vector3 v1, Vector3 v2)
-{
-	Vector3 result = { v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x };
-
-	return result;
-}
 
 // Rotate max radians towards the target
-RMAPI Vector2 RotateTowards(Vector2 from, Vector2 to, float maxRadians)
+/*RMAPI Vector2 RotateTowards(Vector2 from, Vector2 to, float maxRadians)
 {
 	float deltaRadians = LineAngle(from, to);
 	return Rotate(from, fminf(deltaRadians, maxRadians) * Sign(Cross(from, to)));
-} */
-/*
+}*/
 void Update(Rigidbody& rb, float dt)
 {
 	rb.vel = rb.vel + rb.acc * dt;
 	rb.pos = rb.pos + rb.vel * dt + rb.acc * dt * dt * 0.5f;
-	rb.dir = RotateTowards(rb.dir, Normalize(rb.vel), rb.angularSpeed * dt);
+//	rb.dir = RotateTowards(rb.dir, Normalize(rb.vel), rb.angularSpeed * dt);
 }
 
 Vector2 Seek(const Vector2& pos, const Rigidbody& rb, float maxSpeed)
@@ -229,7 +183,7 @@ int main(void)
 	SetTargetFPS(60);
 
 	float seekerProbeLength = 100.0f;
-	float seekerRadius = 25.0f;
+    float seekerRadius = 25.0f;
 	Rigidbody seeker;
 	seeker.pos = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f };
 	seeker.dir = { 0.0f, 1.0f };
@@ -285,4 +239,3 @@ int main(void)
 	CloseWindow();
 	return 0;
 }
-*/
